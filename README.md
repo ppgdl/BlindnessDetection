@@ -1,2 +1,4 @@
-# BlindnessDetection
-BlindnessDetection
+# PlantDisease
+Plant Discrase Recognition
+
+by SenHai, LiangLiang, Wink
