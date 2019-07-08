@@ -1,4 +1,3 @@
-# PlantDisease
-Plant Discrase Recognition
+# Blindness Detection
 
 by SenHai, LiangLiang, Wink
