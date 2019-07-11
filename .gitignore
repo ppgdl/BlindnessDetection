@@ -1,2 +1,6 @@
 *.xml
 *.iml
+./data/*
+!./data/*.py
+!./data/*.sh
+./logs/*
