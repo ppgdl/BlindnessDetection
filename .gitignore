@@ -4,3 +4,8 @@
 !./data/*.py
 !./data/*.sh
 ./logs/*
+
+# python
+.spyproject/
+output/
+*.pyc
