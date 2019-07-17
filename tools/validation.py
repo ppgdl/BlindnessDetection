@@ -21,6 +21,8 @@ import torchvision
 import torch.nn.functional as F
 import data.BlindnessDataSet as BlindnessDataSet
 import pdb
+
+
 def validation(csv_path,log_dir_time, model_):
   
     print('Loading data.')

@@ -8,8 +8,10 @@ import torch
 import torch.nn as nn
 import math
 
+
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
+
 
 class SELayer(nn.Module):  # SeNet Block.
     def __init__(self, channel, reduction=16):
@@ -28,8 +30,10 @@ class SELayer(nn.Module):  # SeNet Block.
         y = self.fc(y).view(b, c, 1, 1)
         return x * y
 
+
 class SEBasicBlock(nn.Module):
     expansion = 4
+
     def __init__(self, inplanes, planes, stride=1, reduction=16):
         super(SEBasicBlock, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
@@ -70,6 +74,7 @@ class SEBasicBlock(nn.Module):
         out = self.relu(out)
 
         return out
+
 
 class SEResNet(nn.Module):
 
@@ -129,3 +134,9 @@ class SEResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
         return x
+
+
+def make_model(model):
+    if model == 'SEResNet50':
+
+        return

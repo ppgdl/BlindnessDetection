@@ -1,9 +1,10 @@
 import argparse
-import pdb
 import os
 import zipfile
 import csv
+import shutil
 
+ROOT = os.path.join(os.getcwd(), '..')
 
 def get_parser(parser):
     parser.add_argument('--data_root', type = str, default = "E:\\code\\dataset\\blindness\\aptos2019-blindness-detection.zip")
@@ -31,6 +32,10 @@ def transform_list(root, csv_file, name):
 
             read_index += 1
 
+    dst_path = os.path.join(ROOT, 'data', 'blindness', name)
+    if not os.path.exists(os.path.join(ROOT, 'data', 'blindness')):
+        os.mkdir(os.path.join(ROOT, 'data', 'blindness'))
+    shutil.copyfile(file_path, dst_path)
 
 def main():
     print("Start Processing!")
@@ -72,11 +77,10 @@ def main():
 
     train_csv = os.path.join(unzip_root, "train.csv")
     test_csv = os.path.join(unzip_root, "test.csv")
-    transform_list(train_image_zip_path, train_csv, "train_list.txt")
+    transform_list(train_image_unzip_path, train_csv, "train_list.txt")
     print("Train_list: {:} done!".format("train_list.txt"))
-    transform_list(test_image_zip_path, test_csv, "test_list.txt")
+    transform_list(test_image_unzip_path, test_csv, "test_list.txt")
     print("Test_list: {:} done!".format("test_list.txt"))
-
 
 
 if __name__ == '__main__':

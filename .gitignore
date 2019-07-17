@@ -1,11 +1,11 @@
 *.xml
 *.iml
-./data/*
+./data/
 !./data/*.py
 !./data/*.sh
 ./logs/*
 
 # python
 .spyproject/
-output/
+output/*
 *.pyc

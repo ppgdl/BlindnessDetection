@@ -5,12 +5,14 @@ Created on Thu Jul 11 19:04:05 2019
 @author: Molly
 """
 
+import torchvision
 import torch
 import torch.nn as nn
 import math
 
 
 class ResNet(nn.Module):
+
     def __init__(self, block, layers, num_classes=5):
         self.inplanes = 64
         super(ResNet, self).__init__()
@@ -66,3 +68,10 @@ class ResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
         return x
+
+
+def make_model(model):
+    if model == 'ResNet50':
+        model = ResNet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 66)
+
+        return model
