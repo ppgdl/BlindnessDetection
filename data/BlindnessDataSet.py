@@ -4,7 +4,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from PIL import Image, ImageFile
+from PIL import Image
 
 ROOT = os.getcwd()
 
@@ -25,6 +25,12 @@ class BlindnessDataSet(Dataset):
             if self.transform != None:
                 img = self.transform(img)
             label = self.data.loc[index, 'diagnosis']
+        elif self.mode == 'test':
+            imgpath = os.path.join(os.path.dirname(self.csv_path), 'testImage', self.data.loc[index, 'id_code'] + '.png')
+            img = Image.open(imgpath)
+            if self.transform != None:
+                img = self.transform(img)
+            return img
         return img, label
     def __len__(self):
         return len(self.data)
@@ -37,7 +43,8 @@ if __name__ == '__main__':
     transform = transforms.Compose([
             transforms.Resize((224,224)),
             transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()])
+            transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
     dataset = BlindnessDataSet(csv_path, transform)
     train_data_loader = DataLoader(dataset, batch_size = 32, shuffle = True, num_workers = 0)
     
