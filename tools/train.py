@@ -20,9 +20,8 @@ import torch.utils.model_zoo as model_zoo
 from validation import validation
 from utils.plot_curve import plot_loss
 
-<<<<<<< HEAD:tools/train.py
 ROOT = os.path.join(os.getcwd(), '..')
-=======
+
 
 
 def parse_args():
@@ -51,7 +50,6 @@ def parse_args():
 
     return args
 
-<<<<<<< HEAD:tools/train.py
 
 def make_model(model_type):
     if model_type is None:
@@ -63,7 +61,7 @@ def make_model(model_type):
         return SEResNet50.make_model(model_type)
     else:
         print("model_type: {:} is not existed now!")
-=======
+
 def load_filtered_state_dict(model, snapshot_path):
     
     snapshot = torch.load(snapshot_path)
@@ -72,7 +70,7 @@ def load_filtered_state_dict(model, snapshot_path):
  #   pdb.set_trace()
     model_dict.update(snapshot)
     model.load_state_dict(model_dict)
->>>>>>> baseline_wink:models/train.py
+
 
 if __name__ == '__main__':
     args = parse_args()
@@ -81,7 +79,6 @@ if __name__ == '__main__':
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     gpu = args.gpu_id
-<<<<<<< HEAD:tools/train.py
     model_type = args.model
     train_path = args.train_path
 
@@ -104,9 +101,7 @@ if __name__ == '__main__':
     output_string = 'blindness_' + strftime("%Y-%m-%d-%H-%M-%S", localtime())
     model = make_model(model_type)
 
-    # load snapshot
-    if args.snapshot != '':
-=======
+
 
     # ResNet50 structure
     model = net.ResNet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 1)
@@ -114,7 +109,6 @@ if __name__ == '__main__':
     if args.snapshot == '':
         load_filtered_state_dict(model, r'E:\BlindnessDetection\output\snapshots\resnet50-19c8e357.pth')
     else:
->>>>>>> baseline_wink:models/train.py
         saved_state_dict = torch.load(args.snapshot)
         try:         
             for k, v in model.state_dict.items():
@@ -128,9 +122,8 @@ if __name__ == '__main__':
     print('Loading data.')
 
     transformations = transforms.Compose([transforms.Resize((224,224)),
-
     transforms.RandomCrop(224), transforms.ToTensor()],
-	transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+	transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
 
     dataset = BlindnessDataSet.BlindnessDataSet(csv_path, transformations)
 
@@ -159,7 +152,6 @@ if __name__ == '__main__':
             
             # Cross entropy loss
             loss = criterion(y_predict, labels)
-            pdb.set_trace()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
