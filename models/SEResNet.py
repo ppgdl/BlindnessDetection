@@ -48,10 +48,10 @@ class SEBasicBlock(nn.Module):
         self.relu = nn.ReLU(inplace=True)
 
 
-        self.se = SELayer(planes, reduction)
-        if inplanes != planes:
-            self.downsample = nn.Sequential(nn.Conv2d(inplanes, planes, kernel_size=1, stride=stride, bias=False),
-                                            nn.BatchNorm2d(planes))
+        self.se = SELayer(planes*4, reduction)
+        if inplanes != planes or inplanes != planes * 4:
+            self.downsample = nn.Sequential(nn.Conv2d(inplanes, planes*4, kernel_size=1, stride=stride, bias=False),
+                                            nn.BatchNorm2d(planes*4))
         else:
             self.downsample = lambda x: x
         self.stride = stride
@@ -78,7 +78,7 @@ class SEBasicBlock(nn.Module):
 
 class SEResNet(nn.Module):
 
-    def __init__(self, num_classes=5):
+    def __init__(self, num_classes=1000):
         self.inplanes = 64
         super(SEResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
@@ -103,14 +103,6 @@ class SEResNet(nn.Module):
                 m.bias.data.zero_()
 
     def _make_layer(self, block, planes, blocks, stride=1):
-        downsample = None
-        if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                nn.Conv2d(self.inplanes, planes * block.expansion,
-                          kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(planes * block.expansion),
-            )
-
         layers = []
         layers.append(block(self.inplanes, planes, stride))
         self.inplanes = planes * block.expansion
