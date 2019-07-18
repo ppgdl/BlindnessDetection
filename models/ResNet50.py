@@ -2,7 +2,7 @@
 """
 Created on Thu Jul 11 19:04:05 2019
 
-@author: Molly
+@author: Wink
 """
 
 import torchvision
@@ -12,8 +12,7 @@ import math
 
 
 class ResNet(nn.Module):
-
-    def __init__(self, block, layers, num_classes=5):
+    def __init__(self, block, layers, num_classes=1):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
@@ -72,6 +71,6 @@ class ResNet(nn.Module):
 
 def make_model(model):
     if model == 'ResNet50':
-        model = ResNet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 66)
+        model = ResNet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 1)
 
         return model

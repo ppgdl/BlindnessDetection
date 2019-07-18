@@ -20,7 +20,10 @@ import torch.utils.model_zoo as model_zoo
 from validation import validation
 from utils.plot_curve import plot_loss
 
+<<<<<<< HEAD:tools/train.py
 ROOT = os.path.join(os.getcwd(), '..')
+=======
+
 
 def parse_args():
     """Parse input arguments."""
@@ -48,6 +51,7 @@ def parse_args():
 
     return args
 
+<<<<<<< HEAD:tools/train.py
 
 def make_model(model_type):
     if model_type is None:
@@ -59,6 +63,16 @@ def make_model(model_type):
         return SEResNet50.make_model(model_type)
     else:
         print("model_type: {:} is not existed now!")
+=======
+def load_filtered_state_dict(model, snapshot_path):
+    
+    snapshot = torch.load(snapshot_path)
+    model_dict = model.state_dict()
+    snapshot = {k: v for k, v in snapshot.items() if k in model_dict and k!='fc.weight' and k!='fc.bias'}
+ #   pdb.set_trace()
+    model_dict.update(snapshot)
+    model.load_state_dict(model_dict)
+>>>>>>> baseline_wink:models/train.py
 
 if __name__ == '__main__':
     args = parse_args()
@@ -67,6 +81,7 @@ if __name__ == '__main__':
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     gpu = args.gpu_id
+<<<<<<< HEAD:tools/train.py
     model_type = args.model
     train_path = args.train_path
 
@@ -91,6 +106,15 @@ if __name__ == '__main__':
 
     # load snapshot
     if args.snapshot != '':
+=======
+
+    # ResNet50 structure
+    model = net.ResNet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 1)
+ 
+    if args.snapshot == '':
+        load_filtered_state_dict(model, r'E:\BlindnessDetection\output\snapshots\resnet50-19c8e357.pth')
+    else:
+>>>>>>> baseline_wink:models/train.py
         saved_state_dict = torch.load(args.snapshot)
         try:         
             for k, v in model.state_dict.items():
@@ -104,17 +128,20 @@ if __name__ == '__main__':
     print('Loading data.')
 
     transformations = transforms.Compose([transforms.Resize((224,224)),
-    transforms.RandomCrop(224), transforms.ToTensor()])
-    dataset = BlindnessDataSet.BlindnessDataSet(train_path, transformations)
+
+    transforms.RandomCrop(224), transforms.ToTensor()],
+	transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
+    dataset = BlindnessDataSet.BlindnessDataSet(csv_path, transformations)
+
 
     train_loader = torch.utils.data.DataLoader(dataset=dataset,
                                                batch_size=batch_size,
-                                               shuffle=True,
-                                               num_workers=2)
+                                               shuffle=True)
 
     model.cuda(gpu)
     
-    criterion = nn.CrossEntropyLoss().cuda(gpu)
+    criterion = nn.MSELoss().cuda(gpu)
 
     optimizer = torch.optim.Adam(model.parameters(), lr = args.lr)
 
@@ -122,16 +149,17 @@ if __name__ == '__main__':
     print('Ready to train network.')
     for epoch in range(num_epochs):
 
+        model.train()
         for i, (images, labels) in enumerate(train_loader):
             images = Variable(images).cuda(gpu)           
-            labels = Variable(labels).cuda(gpu)
-
+            labels = Variable(labels).float().cuda(gpu)
+            labels = labels.view(-1,1)
             # Forward pass
             y_predict = model(images)
-
+            
             # Cross entropy loss
             loss = criterion(y_predict, labels)
-
+            pdb.set_trace()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

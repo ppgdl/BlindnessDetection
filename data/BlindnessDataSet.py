@@ -1,12 +1,12 @@
 import os
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from PIL import Image, ImageFile
+from PIL import Image
 
 ROOT = os.getcwd()
 
 
-class BlindnessDataSet(Dataset):
+class BlindnessDataSet1(Dataset):
     def __init__(self, train_list, transform=None, mode='train'):
         self.mode = mode
         self.train_list = train_list
@@ -35,13 +35,15 @@ class BlindnessDataSet(Dataset):
             if self.transform is not None:
                 image = self.transform(image)
             label = int(label)
-
         return image, label
-
     def __len__(self):
         return len(self.train_list)
 
 
+
+		
+		
+		
 if __name__ == '__main__':
     """
     Test
@@ -50,7 +52,8 @@ if __name__ == '__main__':
     transform = transforms.Compose([
             transforms.Resize((224,224)),
             transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()])
+            transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
     dataset = BlindnessDataSet(csv_path, transform)
     train_data_loader = DataLoader(dataset, batch_size = 32, shuffle = True, num_workers = 0)
     

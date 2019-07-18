@@ -28,13 +28,13 @@ def validation(csv_path,log_dir_time, model_):
     print('Loading data.')
 
     transformations = transforms.Compose([transforms.Resize((224,224)),
-    transforms.CenterCrop(224), transforms.ToTensor()])
+    transforms.CenterCrop(224), transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
     dataset = BlindnessDataSet.BlindnessDataSet(csv_path, transformations)
     
     test_loader = torch.utils.data.DataLoader(dataset=dataset,
-                                               batch_size=16,
-                                               num_workers=2)
+                                               batch_size=16)
 
     print('Ready to validate network.')
 
