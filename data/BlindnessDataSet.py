@@ -2,7 +2,7 @@ import os
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
-
+import pandas as pd
 ROOT = os.getcwd()
 
 
@@ -39,6 +39,31 @@ class BlindnessDataSet1(Dataset):
     def __len__(self):
         return len(self.train_list)
 
+class BlindnessDataSet(Dataset):
+    def __init__(self, csv_path=None, transform=None, mode = 'train'):
+        self.mode = mode
+        self.csv_path = csv_path
+        if csv_path == None:
+            self.csv_path = os.path.join(ROOT, '..', '..', 'data', 'dataset.txt')
+        self.data = pd.read_csv(self.csv_path)
+        self.transform = transform
+
+    def __getitem__(self, index):
+        if self.mode == 'train':
+            imgpath = os.path.join(os.path.dirname(self.csv_path), 'trainImage', self.data.loc[index, 'id_code'] + '.png')
+            img = Image.open(imgpath)
+            if self.transform != None:
+                img = self.transform(img)
+            label = self.data.loc[index, 'diagnosis']
+        elif self.mode == 'test':
+            imgpath = os.path.join(os.path.dirname(self.csv_path), 'testImage', self.data.loc[index, 'id_code'] + '.png')
+            img = Image.open(imgpath)
+            if self.transform != None:
+                img = self.transform(img)
+            return img
+        return img, label
+    def __len__(self):
+        return len(self.data)
 
 
 		

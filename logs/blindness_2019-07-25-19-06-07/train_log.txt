@@ -1,0 +1,13 @@
+Epoch [1/50], Iter [10/228] Loss: 1.8105
+Epoch [1/50], Iter [20/228] Loss: 1.4051
+Epoch [1/50], Iter [30/228] Loss: 0.8081
+Epoch [1/50], Iter [40/228] Loss: 1.3728
+Epoch [1/50], Iter [50/228] Loss: 0.2531
+Epoch [1/50], Iter [60/228] Loss: 0.4582
+Epoch [1/50], Iter [70/228] Loss: 0.9252
+Epoch [1/50], Iter [80/228] Loss: 0.2092
+Epoch [1/50], Iter [90/228] Loss: 0.7935
+Epoch [1/50], Iter [100/228] Loss: 1.6846
+Epoch [1/50], Iter [110/228] Loss: 1.0109
+Epoch [1/50], Iter [120/228] Loss: 0.5947
+Epoch [1/50], Iter [130/228] Loss: 0.3650
