@@ -3,7 +3,38 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
 import pandas as pd
+import cv2
 ROOT = os.getcwd()
+import numpy as np
+
+
+def crop_image1(img,tol=7):
+    # img is image data
+    # tol  is tolerance
+        
+    mask = img>tol
+    return img[np.ix_(mask.any(1),mask.any(0))]
+
+def crop_image_from_gray(img,tol=7):
+    if img.ndim ==2:
+        mask = img>tol
+        return img[np.ix_(mask.any(1),mask.any(0))]
+    elif img.ndim==3:
+        gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        mask = gray_img>tol
+        
+        check_shape = img[:,:,0][np.ix_(mask.any(1),mask.any(0))].shape[0]
+        if (check_shape == 0): # image is too dark so that we crop out everything,
+            return img # return original image
+        else:
+            img1=img[:,:,0][np.ix_(mask.any(1),mask.any(0))]
+            img2=img[:,:,1][np.ix_(mask.any(1),mask.any(0))]
+            img3=img[:,:,2][np.ix_(mask.any(1),mask.any(0))]
+    #         print(img1.shape,img2.shape,img3.shape)
+            img = np.stack([img1,img2,img3],axis=-1)
+    #         print(img.shape)
+        return img
+#The Code from: https://www.kaggle.com/ratthachat/aptos-updated-albumentation-meets-grad-cam
 
 
 class BlindnessDataSet1(Dataset):
@@ -39,28 +70,25 @@ class BlindnessDataSet1(Dataset):
     def __len__(self):
         return len(self.train_list)
 
+
 class BlindnessDataSet(Dataset):
-    def __init__(self, csv_path=None, transform=None, mode = 'train'):
-        self.mode = mode
-        self.csv_path = csv_path
-        if csv_path == None:
-            self.csv_path = os.path.join(ROOT, '..', '..', 'data', 'dataset.txt')
-        self.data = pd.read_csv(self.csv_path)
+    def __init__(self, inputData, transform=None):
+        self.data = inputData
         self.transform = transform
 
     def __getitem__(self, index):
-        if self.mode == 'train':
-            imgpath = os.path.join(os.path.dirname(self.csv_path), 'trainImage', self.data.loc[index, 'id_code'] + '.png')
-            img = Image.open(imgpath)
-            if self.transform != None:
-                img = self.transform(img)
-            label = self.data.loc[index, 'diagnosis']
-        elif self.mode == 'test':
-            imgpath = os.path.join(os.path.dirname(self.csv_path), 'testImage', self.data.loc[index, 'id_code'] + '.png')
-            img = Image.open(imgpath)
-            if self.transform != None:
-                img = self.transform(img)
-            return img
+        dirpath = r'E:\kaggle\trainImage'
+        imgpath = os.path.join(dirpath, self.data.loc[index, 'id_code'] + '.png')
+        image = cv2.imread(imgpath)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = crop_image_from_gray(image)
+        image = cv2.resize(image, (256, 256))
+        image = cv2.addWeighted ( image,4, cv2.GaussianBlur( image , (0,0) , 30) ,-4 ,128)
+        img = transforms.ToPILImage()(image)
+        if self.transform != None:
+            img = self.transform(img)
+        label = self.data.loc[index, 'diagnosis']
+        
         return img, label
     def __len__(self):
         return len(self.data)

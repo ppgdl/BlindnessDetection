@@ -16,14 +16,16 @@ import torch.nn.functional as F
 import models.ResNet50 as ResNet50
 import models.SEResNet as SEResNet50
 from models.efficientnet_pytorch import *
+from tools.validation import validation
 import data.BlindnessDataSet as BlindnessDataSet
 import torch.utils.model_zoo as model_zoo
-from validation import validation
 from utils.plot_curve import plot_loss
 from torch.optim import lr_scheduler
 from sklearn import metrics
 from torch.autograd import Function
 import pdb
+from sklearn.model_selection import train_test_split
+import pandas as pd
 ROOT = os.path.join(os.getcwd(), '..')
 
 
@@ -162,17 +164,25 @@ if __name__ == '__main__':
 
     print('Loading data.')
 
-    transformations = transforms.Compose([transforms.Resize((224,224)),
-    transforms.RandomCrop(224), transforms.ToTensor(),
-	transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+    transformations = transforms.Compose([
+                                transforms.RandomHorizontalFlip(),
+                                transforms.RandomRotation((-120, 120)),
+                                transforms.ToTensor(),
+                                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
-    dataset = BlindnessDataSet.BlindnessDataSet(train_path, transformations)
+    train_csv = pd.read_csv(train_path)
+    train_df, val_df = train_test_split(train_csv, test_size=0.1, random_state=2019, stratify=train_csv.diagnosis)
+    train_df.reset_index(drop=True, inplace=True)
+    val_df.reset_index(drop=True, inplace=True)
+    dataset_train = BlindnessDataSet.BlindnessDataSet(train_df, transformations)  
+    dataset_val = BlindnessDataSet.BlindnessDataSet(val_df, transformations) 
 
-
-    train_loader = torch.utils.data.DataLoader(dataset=dataset,
+    train_loader = torch.utils.data.DataLoader(dataset=dataset_train,
                                                batch_size=batch_size,
                                                shuffle=True)
-    
+    val_loader = torch.utils.data.DataLoader(dataset=dataset_val,
+                                               batch_size=batch_size,
+                                               shuffle=False)    
     criterion = nn.MSELoss().cuda()
  
 #    criterion = kappaLoss().cuda(gpu)
@@ -200,7 +210,7 @@ if __name__ == '__main__':
             
             if (i+1) % 10 == 0:
                 
-                text = 'Epoch [%d/%d], Iter [%d/%d] Loss: %.4f' %(epoch+1, num_epochs, i+1, len(dataset)//batch_size, loss.item())
+                text = 'Epoch [%d/%d], Iter [%d/%d] Loss: %.4f' %(epoch+1, num_epochs, i+1, len(dataset_train)//batch_size, loss.item())
                 print(text)
                 log_dir_time = os.path.join(log_dir, output_string)
                 if not os.path.exists(log_dir_time):
@@ -219,7 +229,7 @@ if __name__ == '__main__':
                 
             torch.save(model.state_dict(), output_snapshot + '\snapshot_epoch_'+ str(epoch+1) + '.pkl')
             
-      #      validation(train_path,log_dir_time, model)
+            validation(val_loader,log_dir_time, model)
 
     ###  now the validation data is the same as train . modify next time
        
